@@ -1,5 +1,9 @@
 # STAT 3355 Group Team 5 Project
 
+## Dataset Information
+Airline On-Time Performance Data: Reporting Carrier On-Time Performance (1987- present): https://www.transtats.bts.gov/DL_SelectFields.aspx?gnoyr_VQ=FGJ&QO_fu146_anzr=b0-gvzr
+
+
 ## Background and Motivation
 This dataset includes all domestic non-stop flights from 1987 to the present. We narrowed down the data to a subset containing only flights arriving in or departing from Texas during June or July of the years 2018-2022. We choose these years because they will give us a good idea of what data was like for before covid and during/after covid. We choose to narrow down the data from the whole USA to Texas because otherwise the dataset would be very large, containing well over a million observations. We choose July and June because it might be more interesting to look at data for summer months, when people are flying for vacations more. 
 
