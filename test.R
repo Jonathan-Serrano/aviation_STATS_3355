@@ -125,17 +125,40 @@ ggplot(data = head(arrange(as.data.frame(avg_of_delay_times_states), desc(Freq))
   ylab("Average Delay Time (mins)") +
   ggtitle("Top 5 States with highest Average Delay Times") +
   theme(text = element_text(size = 20), plot.title = element_text(hjust = 0.5))
-# ---------------------------------------------- ----------------------
+# -Question 8a--------------------------------------------- ----------------------
 
+median_of_delay_times_states <- c()
 
+for (x in dest_states)
+{
+  median_of_delay_times_states <- c(median_of_delay_times_states, median(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_STATE_NM & tx_flights$DEP_DELAY_NEW > 0)]))
+}
+names(median_of_delay_times_states) <- dest_states
 
+#-Question 8b--------------------------------------------------------------------
 
+median_of_delay_times_cities <- c()
 
+for (x in dest_cities)
+{
+  median_of_delay_times_cities <- c(median_of_delay_times_cities, median(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_CITY_NAME & tx_flights$DEP_DELAY_NEW > 0)]))
+}
+names(median_of_delay_times_cities) <- dest_cities
 
+#-Question 6a--------------------------------------------------------------------
 
+sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)
+top_10_airlines <- names(sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)[1:10])
+df_top_10_airlines <- no_zeros_delays[which(no_zeros_delays$OP_UNIQUE_CARRIER %in% top_10_airlines), ]
 
-
-
+ggplot(df_top_10_airlines, aes(x = OP_UNIQUE_CARRIER, y = DEP_DELAY_NEW)) + 
+  geom_boxplot(outlier.shape = NA, fill = "steelblue") +
+  labs(title = "Delay Time per Top 10 Airlines",
+       x = "Unique Carrier",
+       y = "Delay Time in Minutes") +
+  theme(legend.title = element_blank())
+#  scale_color_manual(name = "Legend",
+ #      breaks = c("American Airlines","Delta Air Lines", "ExpressJet Airlines", "Frontier Airlines", "Envoy Air", "Spirit Air Lines", "SkyWest Airlines", "United Air Lines", "Southwest Airlines", "Mesa Airlines" ))
 
 
 
