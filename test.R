@@ -4,6 +4,7 @@
 library(ggplot2)
 library(plyr)
 library(dplyr)
+library(ggthemes)
 
 # Read in all CSV Files
 July_2018 <- read.csv("3355 project 2018 July.csv")
@@ -151,21 +152,33 @@ sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)
 top_10_airlines <- names(sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)[1:10])
 df_top_10_airlines <- no_zeros_delays[which(no_zeros_delays$OP_UNIQUE_CARRIER %in% top_10_airlines), ]
 
-ggplot(df_top_10_airlines, aes(x = OP_UNIQUE_CARRIER, y = DEP_DELAY_NEW)) + 
-  geom_boxplot(outlier.shape = NA, fill = "steelblue") +
+ggplot(df_top_10_airlines, aes(x = as.factor(OP_UNIQUE_CARRIER), y = DEP_DELAY_NEW, fill = as.factor(OP_UNIQUE_CARRIER))) + 
+  geom_boxplot(outlier.shape = NA) +
   labs(title = "Delay Time per Top 10 Airlines",
        x = "Unique Carrier",
        y = "Delay Time in Minutes") +
-  theme(legend.title = element_blank())
-#  scale_color_manual(name = "Legend",
- #      breaks = c("American Airlines","Delta Air Lines", "ExpressJet Airlines", "Frontier Airlines", "Envoy Air", "Spirit Air Lines", "SkyWest Airlines", "United Air Lines", "Southwest Airlines", "Mesa Airlines" ))
+  ylim(0, 175) +
+  theme_economist() +
+  scale_fill_manual(values = c("lightblue", "blue", "steelblue", "navy", "grey", "lightblue","blue", "steelblue", "navy", "grey"),
+                    name = "Airlines",
+                    labels = c("American Airlines","Delta Air Lines", "ExpressJet Airlines","Frontier Airlines", "Envoy Air", 
+                               "Spirit Air Lines", "SkyWest Airlines","United Air Lines", "Southwest Airlines", "Mesa Airlines")) +
+  theme(plot.title = element_text(hjust = 0.5))
+#---Question 8a (freq delay time per city in Texas)-----------------------------------------------------------------
+texas_cities <- c()
+for (x in 1:length(dest_cities))
+    {
+      texas_cities <- append(texas_cities, grepl("TX", dest_cities[x]))
+    }
+texas_cities <- dest_cities[texas_cities]
 
 
-
-
-
-
-
+delay_times_cities <- c()
+for(x in texas_cities)
+{
+  delay_times_cities <- c(delay_times_cities, sum(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_CITY_NAME & tx_flights$DEP_DELAY_NEW > 0)]))
+}
+names(delay_times_cities) <- dest_cities
 
 
 
