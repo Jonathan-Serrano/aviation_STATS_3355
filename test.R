@@ -172,13 +172,18 @@ for (x in 1:length(dest_cities))
     }
 texas_cities <- dest_cities[texas_cities]
 
-
-delay_times_cities <- c()
-for(x in texas_cities)
-{
-  delay_times_cities <- c(delay_times_cities, sum(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_CITY_NAME & tx_flights$DEP_DELAY_NEW > 0)]))
-}
-names(delay_times_cities) <- dest_cities
+ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"))+
+  geom_count(aes(x = DEST_CITY_NAME, y = DEP_DELAY_NEW), color = "steelblue") +
+  scale_x_discrete(labels = c("Abilene","Amarillo","Austin","Beaumont","Brownsville","College Station","Corpus Christi",
+                              "Dallas","Fort Worth","Del Rio","El Paso","Harlingen","Houston","Killeen","Laredo",
+                              "Longview","Lubbock","Midland","Mission","San Angelo","San Antonio","Tyler","Victoria",
+                              "Waco","Wichita Falls"))+
+  scale_color_discrete(name = "Count") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs(x = "City", 
+       y = "Delay Time",
+       title = "Delay Time and Frequency based on Cities in Texas")+
+  theme(plot.title = element_text(hjust = 0.5))
 
 
 
