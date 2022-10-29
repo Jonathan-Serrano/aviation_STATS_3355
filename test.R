@@ -126,17 +126,17 @@ ggplot(data = head(arrange(as.data.frame(avg_of_delay_times_states), desc(Freq))
   ylab("Average Delay Time (mins)") +
   ggtitle("Top 5 States with highest Average Delay Times") +
   theme(text = element_text(size = 20), plot.title = element_text(hjust = 0.5))
-# -Question 8a--------------------------------------------- ----------------------
+# -Question 8b--------------------------------------------- ----------------------
 
-median_of_delay_times_states <- c()
+#median_of_delay_times_states <- c()
 
-for (x in dest_states)
-{
-  median_of_delay_times_states <- c(median_of_delay_times_states, median(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_STATE_NM & tx_flights$DEP_DELAY_NEW > 0)]))
-}
-names(median_of_delay_times_states) <- dest_states
+#for (x in dest_states)
+#{
+#  median_of_delay_times_states <- c(median_of_delay_times_states, median(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_STATE_NM & tx_flights$DEP_DELAY_NEW > 0)]))
+#}
+#names(median_of_delay_times_states) <- dest_states
 
-#-Question 8b--------------------------------------------------------------------
+#-Question 8a--------------------------------------------------------------------
 
 median_of_delay_times_cities <- c()
 
@@ -146,7 +146,7 @@ for (x in dest_cities)
 }
 names(median_of_delay_times_cities) <- dest_cities
 
-#-Question 6a--------------------------------------------------------------------
+#-Question 6 JUSTIFICATION--------------------------------------------------------------------
 
 sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)
 top_10_airlines <- names(sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)[1:10])
@@ -164,27 +164,70 @@ ggplot(df_top_10_airlines, aes(x = as.factor(OP_UNIQUE_CARRIER), y = DEP_DELAY_N
                     labels = c("American Airlines","Delta Air Lines", "ExpressJet Airlines","Frontier Airlines", "Envoy Air", 
                                "Spirit Air Lines", "SkyWest Airlines","United Air Lines", "Southwest Airlines", "Mesa Airlines")) +
   theme(plot.title = element_text(hjust = 0.5))
+
+#-Question 6a-------------------------------------------------------------------------------------------
+
+unique(df_top_10_airlines$DAY_OF_WEEK)
+df_top_10_airlines$DAY_OF_WEEK <- as.factor(df_top_10_airlines$DAY_OF_WEEK)
+ggplot(data = df_top_10_airlines, aes(x = DAY_OF_WEEK, y = DEP_DELAY_NEW)) + 
+  geom_boxplot() +
+  labs(title = "Delay Time per Day of the Week", 
+       x = "Day of the Week", 
+       y = "Delay Time in Minutes") +
+  ylim(0, 175) +
+  theme_economist() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_x_discrete(labels = c("Monday", "Tuesday", "Wednesday", 
+                              "Thursday", "Friday", "Saturday", "Sunday"))
+
+#-Question 6b-------------------------------------------------------------------------------------------
+
+#Not sure how to get flight time from the data frames we have already...
+#I don't think that data is there....
+
 #---Question 8a (freq delay time per city in Texas)-----------------------------------------------------------------
-texas_cities <- c()
+texas_cities <- c(outlier.shape = NA)
 for (x in 1:length(dest_cities))
     {
       texas_cities <- append(texas_cities, grepl("TX", dest_cities[x]))
     }
 texas_cities <- dest_cities[texas_cities]
 
-ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"))+
+ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas")) +
   geom_count(aes(x = DEST_CITY_NAME, y = DEP_DELAY_NEW), color = "steelblue") +
   scale_x_discrete(labels = c("Abilene","Amarillo","Austin","Beaumont","Brownsville","College Station","Corpus Christi",
                               "Dallas","Fort Worth","Del Rio","El Paso","Harlingen","Houston","Killeen","Laredo",
                               "Longview","Lubbock","Midland","Mission","San Angelo","San Antonio","Tyler","Victoria",
-                              "Waco","Wichita Falls"))+
+                              "Waco","Wichita Falls")) +
   scale_color_discrete(name = "Count") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   labs(x = "City", 
        y = "Delay Time",
-       title = "Delay Time and Frequency based on Cities in Texas")+
+       title = "Delay Time and Frequency based on Cities in Texas") +
   theme(plot.title = element_text(hjust = 0.5))
 
+
+#---Question 8b (freq delay time per State)-----------------------------------------------------------------
+
+median_of_delay_times_states <- c()
+
+for (x in dest_states)
+{
+  median_of_delay_times_states <- c(median_of_delay_times_states, median(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_STATE_NM & tx_flights$DEP_DELAY_NEW > 0)]))
+}
+
+names(median_of_delay_times_states) <- c("AL", "AK", "AZ", "AR", "CA", "CO", "CT", 
+                                         "FL", "GA", "HI", "ID", "IL", "IN", "IA", 
+                                         "KS", "KY", "LA", "ME", "MD", "MA", "MI", 
+                                         "MS", "MN", "MO", "MT", "NE", "NV", "NJ", 
+                                         "NM", "NY", "NC", "ND", "OH", "OK", "OR", 
+                                         "PA", "Puerto Rico", "RI", "SC", "SD", "TN", 
+                                         "TX", "U.S. Virgin Islands", "UT", "VT", 
+                                         "VI", "WA", "WV", "WI", "WY")      
+median_of_delay_times_states_df <- data.frame(State_Name = names(median_of_delay_times_states), 
+                                              Delay_Time_Median = median_of_delay_times_states)
+ggplot(median_of_delay_times_states_df, aes(x = State_Name, y = Delay_Time_Median)) +
+  geom_point()
 
 
 #dpt_June_2018 <- tx_flights  %>% filter(YEAR == 2018 & MONTH == 6 & ORIGIN_STATE_NM == "Texas")
