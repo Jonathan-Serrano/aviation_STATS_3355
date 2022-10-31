@@ -136,6 +136,50 @@ ggplot(data = head(arrange(as.data.frame(avg_of_delay_times_states), desc(Freq))
 #}
 #names(median_of_delay_times_states) <- dest_states
 
+#-Question 2a and b--------------------------------------------------------------------
+June2018 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2018  & tx_flights$MONTH == 6)
+July2018 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2018  & tx_flights$MONTH == 7)
+June2019 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2019  & tx_flights$MONTH == 6)
+July2019 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2019  & tx_flights$MONTH == 7)
+June2020 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2020  & tx_flights$MONTH == 6)
+July2020 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2020  & tx_flights$MONTH == 7)
+June2021 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2021  & tx_flights$MONTH == 6)
+July2021 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2021  & tx_flights$MONTH == 7)
+June2022 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2022  & tx_flights$MONTH == 6)
+July2022 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2022  & tx_flights$MONTH == 7)
+
+# All Cancellations to Texas Cities
+ggplot(data = subset(tx_flights, CANCELLED == 1), aes(x=YEAR, fill=factor(MONTH))) + 
+  geom_bar(stat='count', position='dodge') + 
+  labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
+  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("red", "blue")) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+# All Delays to Texas Cities
+ggplot(data = subset(tx_flights, DEP_DELAY > 0), aes(x=YEAR, fill=factor(MONTH))) + 
+  geom_bar(stat='count', position='dodge') + 
+  labs(title = "Delays of Domestic Flights to Texas", x = "Year", y = "Number of Delays") +
+  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("red", "blue")) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+
+# All Cancellations from Texas Cities to Everywhere else in USA
+ggplot(data = subset(tx_flights, CANCELLED == 1 & DEST_STATE_NM != "Texas"), aes(x=YEAR, fill=factor(MONTH))) + 
+  geom_bar(stat='count', position='dodge') + 
+  labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
+  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("red", "blue")) +
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+# All Delays from Texas Cities to Everywhere else in USA
+ggplot(data = subset(tx_flights, DEP_DELAY > 0 & DEST_STATE_NM != "Texas"), aes(x=YEAR, fill=factor(MONTH))) + 
+  geom_bar(stat='count', position='dodge') + 
+  labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
+  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("red", "blue")) +
+  theme(plot.title = element_text(hjust = 0.5))
+
 #-Question 8a--------------------------------------------------------------------
 
 median_of_delay_times_cities <- c()
@@ -146,7 +190,7 @@ for (x in dest_cities)
 }
 names(median_of_delay_times_cities) <- dest_cities
 
-#-Question 6 JUSTIFICATION--------------------------------------------------------------------
+#- Question 6 JUSTIFICATION (Question 7)--------------------------------------------------------------------
 
 sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)
 top_10_airlines <- names(sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)[1:10])
@@ -180,6 +224,7 @@ ggplot(data = df_top_10_airlines, aes(x = DAY_OF_WEEK, y = DEP_DELAY_NEW)) +
   scale_x_discrete(labels = c("Monday", "Tuesday", "Wednesday", 
                               "Thursday", "Friday", "Saturday", "Sunday"))
 
+
 #-Question 6b-------------------------------------------------------------------------------------------
 
 #Not sure how to get flight time from the data frames we have already...
@@ -204,7 +249,27 @@ ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas")) +
   labs(x = "City", 
        y = "Delay Time",
        title = "Delay Time and Frequency based on Cities in Texas") +
+  ylim(0, 100) +
   theme(plot.title = element_text(hjust = 0.5))
+
+#- Question 8a -- Take 2-----------------------------------------------------------------------------------------------
+
+no_zeros_delays["Delay_Range"] <- 0
+no_zeros_delays$Delay_Range[no_zeros_delays$DEP_DELAY_NEW > 0 & no_zeros_delays$DEP_DELAY_NEW <= 10] <- 1
+no_zeros_delays$Delay_Range[no_zeros_delays$DEP_DELAY_NEW > 10 & no_zeros_delays$DEP_DELAY_NEW <= 20] <- 2
+no_zeros_delays$Delay_Range[no_zeros_delays$DEP_DELAY_NEW > 20 & no_zeros_delays$DEP_DELAY_NEW <= 30] <- 3
+no_zeros_delays$Delay_Range[no_zeros_delays$DEP_DELAY_NEW > 30 & no_zeros_delays$DEP_DELAY_NEW <= 40] <- 4
+no_zeros_delays$Delay_Range[no_zeros_delays$DEP_DELAY_NEW > 40] <- 5
+
+ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas" & OP_UNIQUE_CARRIER %in% top_10_airlines),
+       aes(Delay_Range,DEST_CITY_NAME)) + # Create heatmap with ggplot2
+  geom_tile(aes(fill = Delay_Range))
+
+
+  
+
+
+  
 
 
 #---Question 8b (freq delay time per State)-----------------------------------------------------------------
@@ -213,7 +278,8 @@ median_of_delay_times_states <- c()
 
 for (x in dest_states)
 {
-  median_of_delay_times_states <- c(median_of_delay_times_states, median(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_STATE_NM & tx_flights$DEP_DELAY_NEW > 0)]))
+  median_of_delay_times_states <- c(median_of_delay_times_states, 
+                                    median(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_STATE_NM & tx_flights$DEP_DELAY_NEW > 0)]))
 }
 
 names(median_of_delay_times_states) <- c("AL", "AK", "AZ", "AR", "CA", "CO", "CT", 
