@@ -301,3 +301,31 @@ ggplot(median_of_delay_times_states_df, aes(x = State_Name, y = Delay_Time_Media
 # plot
 #g <- ggplot(tx_flights[tx_flights$ORIGIN_STATE_NM == "Texas",],
             #aes(x = as.factor(YEAR), y = DEP_DELAY)) + geom_boxplot()
+
+
+
+#----------(Looking at question 1)--------------------------------
+ggplot(data = no_zeros_delays, aes(x = as.factor(MONTH), y = DEP_DELAY_NEW)) +
+  geom_boxplot() +
+  ylim(0, 175) +
+  facet_wrap(~YEAR)
+#----------(Looking at question 3)--------------------------------
+ggplot(data = no_zeros_delays, aes(x = as.factor(FLIGHTS), y = DEP_DELAY_NEW)) +
+  geom_boxplot() +
+  ylim(0, 175)
+quantile_delay_times <- quantile(no_zeros_delays$DEP_DELAY_NEW)
+mean_delay_times <- sum(no_zeros_delays$DEP_DELAY_NEW) / sum(table(no_zeros_delays$DEP_DELAY_NEW))
+print(quantile_delay_times)
+print(mean_delay_times)
+o_O <- c(1:10) / 10
+o_O_quantile <- quantile(no_zeros_delays$DEP_DELAY_NEW, probs = o_O)
+#could look at flights just from Texas, or just to certain cities, etc...potentially interesting
+#-----------(Looking at question 5)--------------------------------
+ggplot(data = subset(no_zeros_delays, YEAR == "2018" && MONTH == "6" && DAY_OF_WEEK == "2")) +
+  geom_point(mapping = aes(x = DISTANCE, y = DEP_DELAY_NEW))
+ggplot(data = subset(no_zeros_delays, YEAR == "2020" && MONTH == "6" && DAY_OF_WEEK == "3")) +
+  geom_point(mapping = aes(x = DISTANCE, y = DEP_DELAY_NEW))
+#------------(Looking at question 10)-----------------------------
+sort(table(tx_flights$OP_UNIQUE_CARRIER), decreasing = TRUE)
+top_10_airlines_with_zero <- names(sort(table(tx_flights$OP_UNIQUE_CARRIER), decreasing = TRUE)[1:10])
+df_top_10_airlines_with_zero <- tx_flights[which(tx_flights$OP_UNIQUE_CARRIER %in% top_10_airlines_with_zero), ]
