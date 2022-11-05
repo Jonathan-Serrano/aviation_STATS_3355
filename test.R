@@ -204,11 +204,11 @@ ggplot(df_top_10_airlines, aes(x = as.factor(OP_UNIQUE_CARRIER), y = DEP_DELAY_N
        y = "Delay Time in Minutes") +
   ylim(0, 175) +
   theme_economist() +
-  scale_fill_manual(values = c("lightblue", "blue", "steelblue", "navy", "grey", "lightblue","blue", "steelblue", "navy", "grey"),
+  scale_fill_manual(values = c("steelblue1", "steelblue2", "steelblue3", "steelblue4", "lightblue1", "lightblue2","lightblue3", "lightblue4", "cadetblue3", "cadetblue4"),
                     name = "Airlines",
                     labels = c("American Airlines","Delta Air Lines", "ExpressJet Airlines","Frontier Airlines", "Envoy Air", 
                                "Spirit Air Lines", "SkyWest Airlines","United Air Lines", "Southwest Airlines", "Mesa Airlines")) +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
 #-Question 6a-------------------------------------------------------------------------------------------
 
