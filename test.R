@@ -5,6 +5,7 @@ library(ggplot2)
 library(plyr)
 library(dplyr)
 library(ggthemes)
+library(reshape2)
 
 # Read in all CSV Files
 July_2018 <- read.csv("3355 project 2018 July.csv")
@@ -149,36 +150,36 @@ June2022 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & t
 July2022 <- (tx_flights$DEST_STATE_NM == "Texas" & tx_flights$CANCELLED == 1 & tx_flights$YEAR == 2022  & tx_flights$MONTH == 7)
 
 # All Cancellations to Texas Cities
-ggplot(data = subset(tx_flights, CANCELLED == 1), aes(x=YEAR, fill=factor(MONTH))) + 
+ggplot(data = subset(tx_flights, CANCELLED == 1 & DEST_STATE_NM == "Texas"), aes(x=YEAR, fill=factor(MONTH))) + 
   geom_bar(stat='count', position='dodge') + 
   labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
-  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("red", "blue")) +
-  theme(plot.title = element_text(hjust = 0.5))
+  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("steelblue", "salmon")) +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
 
 # All Delays to Texas Cities
-ggplot(data = subset(tx_flights, DEP_DELAY > 0), aes(x=YEAR, fill=factor(MONTH))) + 
+ggplot(data = subset(tx_flights, DEP_DELAY > 0 & DEST_STATE_NM == "Texas"), aes(x=YEAR, fill=factor(MONTH))) + 
   geom_bar(stat='count', position='dodge') + 
   labs(title = "Delays of Domestic Flights to Texas", x = "Year", y = "Number of Delays") +
-  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("red", "blue")) +
-  theme(plot.title = element_text(hjust = 0.5))
+  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("steelblue", "salmon")) +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
 
 
 # All Cancellations from Texas Cities to Everywhere else in USA
 ggplot(data = subset(tx_flights, CANCELLED == 1 & DEST_STATE_NM != "Texas"), aes(x=YEAR, fill=factor(MONTH))) + 
   geom_bar(stat='count', position='dodge') + 
-  labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
-  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("red", "blue")) +
-  theme(plot.title = element_text(hjust = 0.5))
+  labs(title = "Cancellations of Domestic Flights from Texas", x = "Year", y = "Number of Cancellations") +
+  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("steelblue", "salmon")) +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
 
 # All Delays from Texas Cities to Everywhere else in USA
 ggplot(data = subset(tx_flights, DEP_DELAY > 0 & DEST_STATE_NM != "Texas"), aes(x=YEAR, fill=factor(MONTH))) + 
   geom_bar(stat='count', position='dodge') + 
-  labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
-  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("red", "blue")) +
-  theme(plot.title = element_text(hjust = 0.5))
+  labs(title = "Delays of Domestic Flights from Texas", x = "Year", y = "Number of Delays") +
+  scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("steelblue", "salmon")) +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
 #-Question 8a--------------------------------------------------------------------
 
@@ -305,7 +306,7 @@ ggplot(median_of_delay_times_states_df, aes(x = State_Name, y = Delay_Time_Media
 
 
 #----------(Looking at question 1)--------------------------------
-ggplot(data = no_zeros_delays, aes(x = as.factor(MONTH), y = DEP_DELAY_NEW)) +
+ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"), aes(x = as.factor(MONTH), y = DEP_DELAY_NEW)) +
   geom_boxplot() +
   ylim(0, 75) +
   facet_wrap(~YEAR)
@@ -341,8 +342,41 @@ delay_causes_time <- c(sum(tx_flights$CARRIER_DELAY,na.rm=TRUE), sum(tx_flights$
 delay_causes_count <- c(sum(!is.na(tx_flights$CARRIER_DELAY) & 0 != (tx_flights$CARRIER_DELAY)), sum(!is.na(tx_flights$WEATHER_DELAY) & 0 != (tx_flights$WEATHER_DELAY)),
                         sum(!is.na(tx_flights$NAS_DELAY) & 0 != (tx_flights$NAS_DELAY)), sum(!is.na(tx_flights$SECURITY_DELAY) & 0 != (tx_flights$SECURITY_DELAY)),
                         sum(!is.na(tx_flights$LATE_AIRCRAFT_DELAY) & 0 != (tx_flights$LATE_AIRCRAFT_DELAY)))
+options(scipen = 9)
+mat3 <- cbind(delay_causes_time,delay_causes_count, c("Carrier", "Weather", "NAS", "Security", "Late_Aircraft"))
+colnames(mat3) <- c("Delay_cause_time","Delay_cause_count","Cause")
+mat3 <- as.data.frame(mat3)
+mat3$Delay_cause_time <- as.integer(mat3$Delay_cause_time)
+mat3$Delay_cause_count <- as.integer(mat3$Delay_cause_count)
 
-mat3 <- cbind(delay_causes_time,delay_causes_count)
-ggplot(as.data.frame(mat3), aes(x = nrow(as.data.frame(mat3)), y= delay_causes_time))+
-  geom_bar()
+ggplot(mat3, aes(x =  Cause, y = Delay_cause_time)) +
+  geom_bar(stat='identity', fill = "Steelblue") +
+  labs(title = "Total time for Causes of Delay", 
+       x = "Causes", 
+       y = "Total Delay Time in Minutes") +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20)) +
+  scale_x_discrete(labels =  c("Carrier", "Weather", "NAS", "Security", "Late Aircraft"))
+
+
+ggplot(mat3, aes(x =  Cause, y = Delay_cause_count)) +
+  geom_bar(stat='identity', fill = "Salmon") +
+  labs(title = "Total Count for Causes of Delay", 
+       x = "Causes", 
+       y = "NUmber of Delays") +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20)) +
+  scale_x_discrete(labels =  c("Carrier", "Weather", "NAS", "Security", "Late Aircraft"))
+
+ggplot(mat3, aes(x =  Cause, y = (Delay_cause_time /Delay_cause_count))) +
+  geom_bar(stat='identity', fill = "darkseagreen3") +
+  labs(title = "Ratio of Causes of Delay", 
+       x = "Causes", 
+       y = "Ratio") +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20)) +
+  scale_x_discrete(labels =  c("Carrier", "Weather", "NAS", "Security", "Late Aircraft"))
+
+
+
+#ggplot(data = subset(mat3), aes(Delay_cause_time,Cause)) + # Create heatmap with ggplot2
+ # geom_tile(aes(fill = Delay_Range))
+  
 
