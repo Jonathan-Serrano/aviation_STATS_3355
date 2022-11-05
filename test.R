@@ -334,9 +334,15 @@ df_top_10_airlines_with_zero <- tx_flights[which(tx_flights$OP_UNIQUE_CARRIER %i
 # count and the sum of each delay type 
 
 
-delay_causes_time <- c(sum((tx_flights$DEST_STATE_NM == "Texas") & (tx_flights$CARRIER_DELAY, na.rm=TRUE)), sum(tx_flights$WEATHER_DELAY,na.rm=TRUE), 
+delay_causes_time <- c(sum(tx_flights$CARRIER_DELAY,na.rm=TRUE), sum(tx_flights$WEATHER_DELAY,na.rm=TRUE), 
                   sum(tx_flights$NAS_DELAY,na.rm=TRUE), sum(tx_flights$SECURITY_DELAY,na.rm=TRUE), sum(tx_flights$LATE_AIRCRAFT_DELAY,na.rm=TRUE))
 
 
 delay_causes_count <- c(sum(!is.na(tx_flights$CARRIER_DELAY) & 0 != (tx_flights$CARRIER_DELAY)), sum(!is.na(tx_flights$WEATHER_DELAY) & 0 != (tx_flights$WEATHER_DELAY)),
-                        sum(!is.na(tx_flights$NAS_DELAY) & 0 != (tx_flights$NAS_DELAY)), sum(!is.na(tx_flights$SECURITY_DELAY) & 0 != (tx_flights$SECURITY_DELAY)), sum(!is.na(tx_flights$LATE_AIRCRAFT_DELAY) & 0 != (tx_flights$LATE_AIRCRAFT_DELAY)))
+                        sum(!is.na(tx_flights$NAS_DELAY) & 0 != (tx_flights$NAS_DELAY)), sum(!is.na(tx_flights$SECURITY_DELAY) & 0 != (tx_flights$SECURITY_DELAY)),
+                        sum(!is.na(tx_flights$LATE_AIRCRAFT_DELAY) & 0 != (tx_flights$LATE_AIRCRAFT_DELAY)))
+
+mat3 <- cbind(delay_causes_time,delay_causes_count)
+ggplot(as.data.frame(mat3), aes(x = nrow(as.data.frame(mat3)), y= delay_causes_time))+
+  geom_bar()
+
