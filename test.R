@@ -307,7 +307,7 @@ ggplot(median_of_delay_times_states_df, aes(x = State_Name, y = Delay_Time_Media
 #----------(Looking at question 1)--------------------------------
 ggplot(data = no_zeros_delays, aes(x = as.factor(MONTH), y = DEP_DELAY_NEW)) +
   geom_boxplot() +
-  ylim(0, 175) +
+  ylim(0, 75) +
   facet_wrap(~YEAR)
 #----------(Looking at question 3)--------------------------------
 ggplot(data = no_zeros_delays, aes(x = as.factor(FLIGHTS), y = DEP_DELAY_NEW)) +
@@ -329,3 +329,14 @@ ggplot(data = subset(no_zeros_delays, YEAR == "2020" && MONTH == "6" && DAY_OF_W
 sort(table(tx_flights$OP_UNIQUE_CARRIER), decreasing = TRUE)
 top_10_airlines_with_zero <- names(sort(table(tx_flights$OP_UNIQUE_CARRIER), decreasing = TRUE)[1:10])
 df_top_10_airlines_with_zero <- tx_flights[which(tx_flights$OP_UNIQUE_CARRIER %in% top_10_airlines_with_zero), ]
+#------------(Looking at question 4)-----------------------------
+# only coming into texas 
+# count and the sum of each delay type 
+
+
+delay_causes_time <- c(sum((tx_flights$DEST_STATE_NM == "Texas") & (tx_flights$CARRIER_DELAY, na.rm=TRUE)), sum(tx_flights$WEATHER_DELAY,na.rm=TRUE), 
+                  sum(tx_flights$NAS_DELAY,na.rm=TRUE), sum(tx_flights$SECURITY_DELAY,na.rm=TRUE), sum(tx_flights$LATE_AIRCRAFT_DELAY,na.rm=TRUE))
+
+
+delay_causes_count <- c(sum(!is.na(tx_flights$CARRIER_DELAY) & 0 != (tx_flights$CARRIER_DELAY)), sum(!is.na(tx_flights$WEATHER_DELAY) & 0 != (tx_flights$WEATHER_DELAY)),
+                        sum(!is.na(tx_flights$NAS_DELAY) & 0 != (tx_flights$NAS_DELAY)), sum(!is.na(tx_flights$SECURITY_DELAY) & 0 != (tx_flights$SECURITY_DELAY)), sum(!is.na(tx_flights$LATE_AIRCRAFT_DELAY) & 0 != (tx_flights$LATE_AIRCRAFT_DELAY)))
