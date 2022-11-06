@@ -379,4 +379,11 @@ ggplot(mat3, aes(x =  Cause, y = (Delay_cause_time /Delay_cause_count))) +
 #ggplot(data = subset(mat3), aes(Delay_cause_time,Cause)) + # Create heatmap with ggplot2
  # geom_tile(aes(fill = Delay_Range))
   
+#------------(Looking at question 9)-----------------------------
+
+ggplot(data = subset(tx_flights,!is.na(DIV_ARR_DELAY) & DEST_STATE_NM == "Texas"), aes(x=YEAR, fill=factor(MONTH), y = DIV_ARR_DELAY)) + 
+  geom_boxplot() +
+  #labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
+  #scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("steelblue", "salmon")) +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
