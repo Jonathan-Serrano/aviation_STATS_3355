@@ -226,6 +226,26 @@ ggplot(data = df_top_10_airlines, aes(x = DAY_OF_WEEK, y = DEP_DELAY_NEW)) +
                               "Thursday", "Friday", "Saturday", "Sunday"))
 
 
+
+
+
+ggplot(data = subset(tx_flights, CANCELLED == 1 & DEST_STATE_NM == "Texas"), aes(x = DAY_OF_WEEK)) + 
+  geom_bar(stat='count',  position='dodge') +
+  labs(title = "Count OF cance Day of the Week", 
+       x = "Day of the Week", 
+       y = "Delay Time in Minutes") +
+  theme_economist() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_fill_manual(labels = c("Monday", "Tuesday", "Wednesday", 
+                              "Thursday", "Friday", "Saturday", "Sunday"))
+
+
+
+
+
+
+
+
 #-Question 6b-------------------------------------------------------------------------------------------
 
 #Not sure how to get flight time from the data frames we have already...
@@ -323,7 +343,8 @@ o_O_quantile <- quantile(no_zeros_delays$DEP_DELAY_NEW, probs = o_O)
 #could look at flights just from Texas, or just to certain cities, etc...potentially interesting
 #-----------(Looking at question 5)--------------------------------
 ggplot(data = subset(no_zeros_delays, YEAR == "2018" && MONTH == "6" && DAY_OF_WEEK == "2")) +
-  geom_point(mapping = aes(x = DISTANCE, y = DEP_DELAY_NEW))
+  geom_point(mapping = aes(x = DISTANCE, y = DEP_DELAY_NEW)) +
+  ylim(0,2000)
 ggplot(data = subset(no_zeros_delays, YEAR == "2020" && MONTH == "6" && DAY_OF_WEEK == "3")) +
   geom_point(mapping = aes(x = DISTANCE, y = DEP_DELAY_NEW))
 #------------(Looking at question 10)-----------------------------
@@ -381,9 +402,55 @@ ggplot(mat3, aes(x =  Cause, y = (Delay_cause_time /Delay_cause_count))) +
   
 #------------(Looking at question 9)-----------------------------
 
-ggplot(data = subset(tx_flights,!is.na(DIV_ARR_DELAY) & DEST_STATE_NM == "Texas"), aes(x=YEAR, fill=factor(MONTH), y = DIV_ARR_DELAY)) + 
-  geom_boxplot() +
+
+tx_flights["DIV_REACHED_DEST"][tx_flights["DIV_REACHED_DEST"] == 0] <- 2
+
+ggplot(data = subset(tx_flights,!is.na(DIV_ARR_DELAY) & DEST_STATE_NM == "Texas"), aes(x=as.factor(YEAR), color=as.factor(MONTH), y = DIV_ARR_DELAY)) + 
+  geom_jitter() +
+  geom_boxplot(outlier.shape = NA)
+  
   #labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
   #scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("steelblue", "salmon")) +
   theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
+
+ggplot(data = subset(tx_flights,!is.na(DIV_ARR_DELAY) & DEST_STATE_NM == "Texas"), aes(x = DIV_ARR_DELAY, color = as.factor(DIV_REACHED_DEST))) +
+  geom_density() +
+  scale_x_discrete(drop=FALSE)
+
+
+# ---- NEW Question -------------------
+m1 <- cbind( table(df_top_10_airlines_with_zero$OP_UNIQUE_CARRIER),
+             table(df_top_10_airlines$OP_UNIQUE_CARRIER), 
+             c("American Airlines","Delta Air Lines", "ExpressJet Airlines","Frontier Airlines", "Envoy Air", 
+              "Spirit Air Lines", "SkyWest Airlines","United Air Lines", "Southwest Airlines", "Mesa Airlines"))
+colnames(m1) <- c("flight_count","delay_count", "airline_name")
+m1 <- as.data.frame(m1)
+m1$flight_count <- as.integer(m1$flight_count)
+m1$delay_count <- as.integer(m1$delay_count)
+
+ggplot(m1, aes(x =  flight_count, y = delay_count, color  = as.factor(airline_name))) +
+  geom_point(aes(size = 5)) 
+
+top_cities <- names( head(sort(table(tx_flights$DEST_STATE_NM), decreasing = TRUE), 20))
+m2 <- cbind( head(sort(table(tx_flights$DEST_STATE_NM), decreasing = TRUE), 20)[sort(names(head(sort(table(tx_flights$DEST_STATE_NM), decreasing = TRUE), 20)))],
+            table(no_zeros_delays[which(no_zeros_delays$DEST_STATE_NM %in% top_cities), ]$DEST_STATE_NM),
+             sort(names( head(sort(table(tx_flights$DEST_STATE_NM), decreasing = TRUE), 20)), decreasing = FALSE)   )
+  
+
+
+
+colnames(m2) <- c("flight_count","delay_count", "city_name")
+m2 <- as.data.frame(m2)
+m2$flight_count <- as.integer(m2$flight_count)
+m2$delay_count <- as.integer(m2$delay_count)
+
+ggplot(m2, aes(x =  flight_count, y = delay_count, color  = as.factor(city_name))) +
+  geom_point(aes(size = 5)) +
+  ylim(0, 30000) +
+  xlim(0,60000)
+            
+
+
+
+
 
