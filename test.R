@@ -1,6 +1,9 @@
 # Project Group 5
-# Loading the necessary packages
+
+
 #### NO STATE OF DELAWARE or NEW HAMPSHIRE (INSTEAD WE HAVE U.S VIRGINS AND PUERTO RICO) ####
+
+# Loading the necessary packages
 library(ggplot2)
 library(plyr)
 library(dplyr)
@@ -19,46 +22,12 @@ June_2021 <- read.csv("3355 project 2021 June.csv")
 July_2022 <- read.csv("3355 project 2022 July.csv")
 June_2022 <- read.csv("3355 project 2022 June.csv")
 
-# Bind them Together
+# Binded all data frames  Together
 tx_flights <- rbind(June_2018, July_2018, 
                     June_2019, July_2019, 
                     June_2020, July_2020, 
                     June_2021, July_2021, 
                     June_2022, July_2022)
-#tx_flights["month_year"] <- c(1: length(tx_flights$YEAR))
-
-#for (x in 1:nrow(tx_flights)) {
- # if (tx_flights[x, YEAR] == 2018 & tx_flights[x, MONTH] == "June") {
- #   tx_flights["month_year"] <- 1
- # }
-#}
-#for (x in 1:nrow(tx_flights)) {
-  #if (tx_flights$YEAR[x] == 2018 & tx_flights$MONTH[x] == "June") {
-   # tx_flights$month_year[x] <- 1
-  #}
-#}
-
-#dpt_July_2018 <- July_2018$DEP_DELAY[July_2018$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_July_2018 <- mean(dpt_July_2018, na.rm = TRUE)
-#dpt_June_2018 <- June_2018$DEP_DELAY[June_2018$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_June_2018 <- mean(dpt_June_2018, na.rm = TRUE)
-#dpt_July_2019 <- July_2019$DEP_DELAY[July_2019$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_July_2019 <- mean(dpt_July_2019, na.rm = TRUE)
-#dpt_June_2019 <- June_2019$DEP_DELAY[June_2019$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_June_2019 <- mean(dpt_June_2019, na.rm = TRUE)
-#dpt_July_2020 <- July_2020$DEP_DELAY[July_2020$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_July_2020 <- mean(dpt_July_2020, na.rm = TRUE)
-#dpt_June_2020 <- June_2020$DEP_DELAY[June_2020$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_June_2020 <- mean(dpt_June_2020, na.rm = TRUE)
-#dpt_July_2021 <- July_2021$DEP_DELAY[July_2021$ORIGIN_STATE_NM == "Texas"]
-##mean_dpt_July_2021 <- mean(dpt_July_2021, na.rm = TRUE)
-#dpt_June_2021 <- June_2021$DEP_DELAY[June_2021$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_June_2021 <- mean(dpt_June_2021, na.rm = TRUE)
-#dpt_July_2022 <- July_2022$DEP_DELAY[July_2022$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_July_2022 <- mean(dpt_July_2022, na.rm = TRUE)
-#dpt_June_2022 <- June_2022$DEP_DELAY[June_2022$ORIGIN_STATE_NM == "Texas"]
-#mean_dpt_June_2022 <- mean(dpt_June_2022, na.rm = TRUE)
-
 
 
 # -------------  Average Delay times for Cities  ----------------------
@@ -80,9 +49,7 @@ for (x in 1:nrow(tx_flights)) { # Loop through DF
     }
 }
 
-
 no_zeros_delays <- tx_flights %>% filter(DEP_DELAY_NEW > 0)
-
 
 # Average delay time 
 avg_of_delay_times_city <- sum_of_delay_times_city / table(no_zeros_delays$DEST_CITY_NAME)
@@ -181,42 +148,62 @@ ggplot(data = subset(tx_flights, DEP_DELAY > 0 & DEST_STATE_NM != "Texas"), aes(
   scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("steelblue", "salmon")) +
   theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
-#-Question 8a--------------------------------------------------------------------
 
-median_of_delay_times_cities <- c()
 
-for (x in dest_cities)
-{
-  median_of_delay_times_cities <- c(median_of_delay_times_cities, median(tx_flights$DEP_DELAY_NEW[which(x == tx_flights$DEST_CITY_NAME & tx_flights$DEP_DELAY_NEW > 0)]))
-}
-names(median_of_delay_times_cities) <- dest_cities
+#----Question 3.3------------------------------------------------(DONE)---------
 
-#- Question 6 JUSTIFICATION (Question 7)--------------------------------------------------------------------
-
+# Sorted out the top 10 airline carriers with highest count of delayed flights 
 sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)
-top_10_airlines <- names(sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), decreasing = TRUE)[1:10])
-df_top_10_airlines <- no_zeros_delays[which(no_zeros_delays$OP_UNIQUE_CARRIER %in% top_10_airlines), ]
 
-ggplot(df_top_10_airlines, aes(x = as.factor(OP_UNIQUE_CARRIER), y = DEP_DELAY_NEW, fill = as.factor(OP_UNIQUE_CARRIER))) + 
+# Get the Names of those same airlines carriers 
+top_10_airlines <- names(sort(table(no_zeros_delays$OP_UNIQUE_CARRIER), 
+                                    decreasing = TRUE)[1:10])
+
+# Make a new data frame using only those airlines carriers 
+df_top_10_airlines <- no_zeros_delays[which(no_zeros_delays$OP_UNIQUE_CARRIER 
+                                            %in% top_10_airlines), ]
+
+# 10 Box plots of Delay Time Distribution of top ten Airline Carriers 
+ggplot(df_top_10_airlines, aes(x = as.factor(OP_UNIQUE_CARRIER), 
+                               y = DEP_DELAY_NEW, 
+                               fill = as.factor(OP_UNIQUE_CARRIER))) + 
   geom_boxplot(outlier.shape = NA) +
   labs(title = "Delay Time per Top 10 Airlines",
        x = "Unique Carrier",
        y = "Delay Time in Minutes") +
-  ylim(0, 175) +
+  ylim(0, 20) +
   theme_economist() +
-  scale_fill_manual(values = c("steelblue1", "steelblue2", "steelblue3", "steelblue4", "lightblue1", "lightblue2","lightblue3", "lightblue4", "cadetblue3", "cadetblue4"),
-                    name = "Airlines",
-                    labels = c("American Airlines","Delta Air Lines", "ExpressJet Airlines","Frontier Airlines", "Envoy Air", 
-                               "Spirit Air Lines", "SkyWest Airlines","United Air Lines", "Southwest Airlines", "Mesa Airlines")) +
-  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
+  scale_fill_manual(values = rep("steelblue4", 10)) + 
+  scale_x_discrete(labels = c("American Airlines", "Delta Air Lines", 
+                              "ExpressJet Airlines", "Frontier Airlines", 
+                              "Envoy Air", "Spirit Air Lines", 
+                              "SkyWest Airlines", "United Air Lines", 
+                              "Southwest Airlines", "Mesa Airlines")) +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20),
+        axis.text.x = element_text(angle = 70, vjust = 1.05, hjust = 1), 
+        legend.position = "none")
 
-#-Question 6a-------------------------------------------------------------------------------------------
+#--- Question 4.2 ----------------------------------------------------(DONE)----
 
-unique(df_top_10_airlines$DAY_OF_WEEK)
-df_top_10_airlines$DAY_OF_WEEK <- as.factor(df_top_10_airlines$DAY_OF_WEEK)
-ggplot(data = df_top_10_airlines, aes(x = DAY_OF_WEEK, y = DEP_DELAY_NEW)) + 
+# Make sure each day has roughly the same number of flights (for flights coming 
+# into Texas) to directly compare count of cancellations for each day and delay 
+# distribution for each day
+sort(table(tx_flights[tx_flights$DEST_STATE_NM == "Texas", ]$DAY_OF_WEEK), 
+           decreasing = TRUE)
+
+
+# Check if there were flights with an unknown date of the week
+unique(no_zeros_delays$DAY_OF_WEEK)
+
+# Changing DAY_OF_WEEK column into a factor variable
+no_zeros_delays$DAY_OF_WEEK <- as.factor(no_zeros_delays$DAY_OF_WEEK)
+
+# Box plots of Delay Time Distribution for each day of the week 
+# (for flights coming into Texas)
+ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"), 
+       aes(x = DAY_OF_WEEK, y = DEP_DELAY_NEW)) + 
   geom_boxplot() +
-  labs(title = "Delay Time per Day of the Week", 
+  labs(title = "Delay Time per Day of the Week of Texas Flights", 
        x = "Day of the Week", 
        y = "Delay Time in Minutes") +
   ylim(0, 175) +
@@ -226,25 +213,18 @@ ggplot(data = df_top_10_airlines, aes(x = DAY_OF_WEEK, y = DEP_DELAY_NEW)) +
                               "Thursday", "Friday", "Saturday", "Sunday"))
 
 
-
-
-
-ggplot(data = subset(tx_flights, CANCELLED == 1 & DEST_STATE_NM == "Texas"), aes(x = DAY_OF_WEEK)) + 
-  geom_bar(stat='count',  position='dodge') +
-  labs(title = "Count OF cance Day of the Week", 
+# Bar plots of count of cancelled flights for each day of the week 
+# (for flights coming into Texas)
+ggplot(data = subset(tx_flights, CANCELLED == 1 & DEST_STATE_NM == "Texas"), 
+       aes(x = DAY_OF_WEEK)) + 
+  geom_bar(stat = 'count',  position = 'dodge') +
+  labs(title = "Count of Cancelled Texas Flights per Day of the Week", 
        x = "Day of the Week", 
-       y = "Delay Time in Minutes") +
-  theme_economist() +
+       y = "Count of Cancelled Flights") +
+  scale_fill_manual(values = rep("steelblue4", 7)) + 
   theme(plot.title = element_text(hjust = 0.5)) +
-  scale_fill_manual(labels = c("Monday", "Tuesday", "Wednesday", 
+  scale_x_discrete(labels = c("Monday", "Tuesday", "Wednesday", 
                               "Thursday", "Friday", "Saturday", "Sunday"))
-
-
-
-
-
-
-
 
 #-Question 6b-------------------------------------------------------------------------------------------
 
