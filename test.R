@@ -311,9 +311,15 @@ ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"), aes(x = as.fact
   ylim(0, 75) +
   facet_wrap(~YEAR)
 #----------(Looking at question 3)--------------------------------
-ggplot(data = no_zeros_delays, aes(x = as.factor(FLIGHTS), y = DEP_DELAY_NEW)) +
-  geom_boxplot() +
-  ylim(0, 175)
+ggplot(data = no_zeros_delays, aes(x = DEP_DELAY_NEW)) +
+  geom_histogram(bins = 50, color = "black", fill = "steelblue")+
+  xlim(0, 600)+
+  ylim(0, 110000)+
+  labs( x = "Departure Time in Minutes", y = "Number of Delays", title = "Distribution of Delay Times")+
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))+
+  geom_vline(aes(xintercept=mean(DEP_DELAY_NEW),color="mean"), linetype="dashed", size=1) +
+  geom_vline(aes(xintercept=median(DEP_DELAY_NEW),color="median"), linetype="dashed", size=1)+
+  scale_color_manual(name = "Labels", values = c(median = "aquamarine3", mean = "salmon"))
 quantile_delay_times <- quantile(no_zeros_delays$DEP_DELAY_NEW)
 mean_delay_times <- sum(no_zeros_delays$DEP_DELAY_NEW) / sum(table(no_zeros_delays$DEP_DELAY_NEW))
 print(quantile_delay_times)
@@ -411,10 +417,10 @@ m1$delay_count <- as.integer(m1$delay_count)
 ggplot(m1, aes(x =  flight_count, y = delay_count, color  = as.factor(airline_name))) +
   geom_point(aes(size = 5)) 
 
-top_cities <- names( head(sort(table(tx_flights$DEST_STATE_NM), decreasing = TRUE), 20))
-m2 <- cbind( head(sort(table(tx_flights$DEST_STATE_NM), decreasing = TRUE), 20)[sort(names(head(sort(table(tx_flights$DEST_STATE_NM), decreasing = TRUE), 20)))],
-            table(no_zeros_delays[which(no_zeros_delays$DEST_STATE_NM %in% top_cities), ]$DEST_STATE_NM),
-             sort(names( head(sort(table(tx_flights$DEST_STATE_NM), decreasing = TRUE), 20)), decreasing = FALSE)   )
+top_cities <- names( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20))
+m2 <- cbind( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)[sort(names(head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)))],
+            table(no_zeros_delays[which(no_zeros_delays$DEST_CITY_NAME %in% top_cities), ]$DEST_CITY_NAME),
+             sort(names( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)), decreasing = FALSE)   )
   
 
 
@@ -425,12 +431,18 @@ m2$flight_count <- as.integer(m2$flight_count)
 m2$delay_count <- as.integer(m2$delay_count)
 
 ggplot(m2, aes(x =  flight_count, y = delay_count, color  = as.factor(city_name))) +
-  geom_point(aes(size = 5)) +
-  ylim(0, 30000) +
-  xlim(0,60000)
-            
+  geom_point(aes(size = 5))+
+  labs( x = "Number of Flights", y = "Number of Delays", title = "Flight vs. Delay for Top 20 Cities")+
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))+
+          scale_colour_discrete(name = "City Names")
 
 
 
+top_10_cities <- names(sort(table(no_zeros_delays$DEST_CITY_NAME), decreasing = TRUE)[1:10])
+df_top_10_cities <- no_zeros_delays[which(no_zeros_delays$DEST_CITY_NAME %in% top_10_cities), ]
+
+ggplot(df_top_10_cities, aes(x = DEST_CITY_NAME , y = DEP_DELAY_NEW , fill = as.factor(DEST_CITY_NAME))) +
+  geom_boxplot()+
+  ylim(0, 100)
 
 
