@@ -279,7 +279,7 @@ ggplot(data = subset(no_zeros_delays,
   geom_point(mapping = aes(x = DISTANCE, y = DEP_DELAY_NEW)) +
   ylim(0,2000) +
   labs(title = "Delay Time by Distance", x = "Distance in miles", 
-       y = "Delay Time in minutes") +
+       y = "Delay Time in minutes") 
   
 
 #---Question 4.3------------------------------------------------(DONE)----------
