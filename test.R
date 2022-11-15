@@ -1,7 +1,4 @@
-# Project Group 5
-
-
-#### NO STATE OF DELAWARE or NEW HAMPSHIRE (INSTEAD WE HAVE U.S VIRGINS AND PUERTO RICO) ####
+# Project - Group 5
 
 # Loading the necessary packages
 library(ggplot2)
@@ -10,7 +7,7 @@ library(dplyr)
 library(ggthemes)
 library(reshape2)
 
-# Read in all CSV Files
+# Reading all CSV Files
 July_2018 <- read.csv("3355 project 2018 July.csv")
 June_2018 <- read.csv("3355 project 2018 June.csv")
 July_2019 <- read.csv("3355 project 2019 July.csv")
@@ -22,33 +19,15 @@ June_2021 <- read.csv("3355 project 2021 June.csv")
 July_2022 <- read.csv("3355 project 2022 July.csv")
 June_2022 <- read.csv("3355 project 2022 June.csv")
 
-# Binded all data frames  Together
+# Binded these 10 data frames together
 tx_flights <- rbind(June_2018, July_2018, 
                     June_2019, July_2019, 
                     June_2020, July_2020, 
                     June_2021, July_2021, 
                     June_2022, July_2022)
 
-
-# -------------  Average Delay times for Cities  ----------------------
-dest_cities <- unique(tx_flights$DEST_CITY_NAME) # Get all City Names
-dest_cities <- sort(dest_cities) # Sort City names
-sum_of_delay_times_city <- (1:203 * 0) # Set all sums to 0
-names(sum_of_delay_times_city) <- dest_cities # name sum vector
-
-num_of_each_city <-(1:203 * 0)
-names(num_of_each_city) <- dest_cities
-
-
-tx_flights$DEP_DELAY_NEW[is.na(tx_flights$DEP_DELAY_NEW)] <- 0 # Set All NA in DEP_DELAY_NEW to 0 
-for (x in 1:nrow(tx_flights)) { # Loop through DF
-  if(tx_flights[x,"DEP_DELAY_NEW"] > 0) {
-    name <- tx_flights[x,"DEST_CITY_NAME"] # Get Name of city
-    sum_of_delay_times_city[name] <- sum_of_delay_times_city[name] + tx_flights[x,"DEP_DELAY_NEW"] # Add to sum
-    num_of_each_city[name] <- num_of_each_city[name] + 1
-  }
-}
-
+# Sub-setting tx_flights data frame 
+# to include observations only on delayed flights
 no_zeros_delays <- tx_flights %>% filter(DEP_DELAY_NEW > 0)
 
 #-Question 3.2-------------------------------------------------------(DONE)-----
@@ -155,22 +134,7 @@ ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"),
   scale_x_discrete(labels = c("Monday", "Tuesday", "Wednesday", 
                               "Thursday", "Friday", "Saturday", "Sunday"))
 
-
-# Bar plots of count of cancelled flights for each day of the week 
-# (for flights coming into Texas)
-ggplot(data = subset(tx_flights, CANCELLED == 1 & DEST_STATE_NM == "Texas"), 
-       aes(x = DAY_OF_WEEK)) + 
-  geom_bar(stat = 'count',  position = 'dodge') +
-  labs(title = "Count of Cancelled Texas Flights per Day of the Week", 
-       x = "Day of the Week", 
-       y = "Count of Cancelled Flights") +
-  scale_fill_manual(values = rep("steelblue4", 7)) + 
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_x_discrete(labels = c("Monday", "Tuesday", "Wednesday", 
-                              "Thursday", "Friday", "Saturday", "Sunday"))
-
-
-#---Question 3.4a-------------------------------------------------------(DONE)--
+#---Question 3.4a------------------------------------------------(DONE)---------
 
 # Get all State Names
 dest_states <- unique(no_zeros_delays$DEST_STATE_NM) 
@@ -213,11 +177,11 @@ ggplot(median_of_delay_times_states_df,
   scale_color_manual(name = 'legend') +
   theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
-  
-  
 
 #---Question 3.4b ---------------------------------------------------(DONE)-----
 
+# Sub-setting no_zeros_delays data frame
+# to include only flights which had a destination city in Texas
 no_zero_delays_dest_texas_city <- subset(no_zeros_delays, 
                                          DEST_STATE_NM == "Texas")
 
@@ -309,7 +273,7 @@ print(quantile_10)
 
 #---Question 4.4------------------------------------(DONE)----------------------
 
-#Scatter Plot of Delay Time by Distance
+# Scatter Plot of Delay Time by Distance
 ggplot(data = subset(no_zeros_delays, 
                      YEAR == "2018" && MONTH == "6" && DAY_OF_WEEK == "2")) +
   geom_point(mapping = aes(x = DISTANCE, y = DEP_DELAY_NEW)) +
@@ -318,28 +282,42 @@ ggplot(data = subset(no_zeros_delays,
        y = "Delay Time in minutes") +
   
 
-#---Question 4.3---------------------------------------------------------------
+#---Question 4.3------------------------------------------------(DONE)----------
 
-#sort(table(tx_flights$OP_UNIQUE_CARRIER), decreasing = TRUE)
-#top_10_airlines_with_zero <- names(sort(table(tx_flights$OP_UNIQUE_CARRIER), decreasing = TRUE)[1:10])
-#df_top_10_airlines_with_zero <- tx_flights[which(tx_flights$OP_UNIQUE_CARRIER %in% top_10_airlines_with_zero), ]
+# seeing which are the 20 cities with the most flights 
+# in the tx_flights data frame 
+top_cities <- names(head(sort(table(tx_flights$DEST_CITY_NAME), 
+                              decreasing = TRUE), 20))
 
-top_cities <- names( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20))
-m2 <- cbind( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)[sort(names(head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)))],
-             table(no_zeros_delays[which(no_zeros_delays$DEST_CITY_NAME %in% top_cities), ]$DEST_CITY_NAME),
-             sort(names( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)), decreasing = FALSE))
-
+# making a matrix of flight count and delay count
+# for these 20 cities
+m2 <- cbind(head(sort(table(tx_flights$DEST_CITY_NAME), 
+                      decreasing = TRUE), 20)
+            [sort(names(head(sort(table(tx_flights$DEST_CITY_NAME), 
+                                  decreasing = TRUE), 20)))],
+            table(no_zeros_delays[which(no_zeros_delays$DEST_CITY_NAME 
+                                        %in% top_cities), ]$DEST_CITY_NAME),
+            sort(names( head(sort(table(tx_flights$DEST_CITY_NAME), 
+                                  decreasing = TRUE), 20)), 
+                 decreasing = FALSE))
 colnames(m2) <- c("flight_count","delay_count", "city_name")
+
+# turning m2 into a data frame
 m2 <- as.data.frame(m2)
+
+# converting some of the variables in m2 into integer variables
 m2$flight_count <- as.integer(m2$flight_count)
 m2$delay_count <- as.integer(m2$delay_count)
 
-ggplot(m2, aes(x =  flight_count, y = delay_count, color  = as.factor(city_name))) +
+# Plotting number of flights versus number of delays for each of the 20 cities
+ggplot(m2, aes(x = flight_count, y = delay_count, 
+               color = as.factor(city_name))) +
   geom_point(aes(size = 5))+
-  labs( x = "Number of Flights", y = "Number of Delays", title = "Flight vs. Delay for Top 20 Cities")+
-  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))+
+  labs(x = "Number of Flights", y = "Number of Delays", 
+       title = "Flight vs. Delay for Top 20 Cities") +
+  theme(plot.title = element_text(hjust = 0.5), 
+        text = element_text(size = 20))+
   scale_colour_discrete(name = "City Names")
-
 
 #---Question 3.5---------------------------------------------------(DONE)-------
 
@@ -404,64 +382,13 @@ ggplot(delay_causes,
        y = "Minutes") +
   theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
 
-#------------(Looking at question 9)-----------------------------
+#-------Question 4.5----------------------------------------------(DONE)--------
 
-
-tx_flights["DIV_REACHED_DEST"][tx_flights["DIV_REACHED_DEST"] == 0] <- 2
-
-ggplot(data = subset(tx_flights,!is.na(DIV_ARR_DELAY) & DEST_STATE_NM == "Texas"), aes(x=as.factor(YEAR), color=as.factor(MONTH), y = DIV_ARR_DELAY)) + 
-  geom_jitter() +
-  geom_boxplot(outlier.shape = NA)
-
-#labs(title = "Cancellations of Domestic Flights to Texas", x = "Year", y = "Number of Cancellations") +
-#scale_fill_manual(name = "Month", labels = c("June", "July"), values= c("steelblue", "salmon")) +
-theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
-
-ggplot(data = subset(tx_flights,!is.na(DIV_ARR_DELAY) & DEST_STATE_NM == "Texas"), aes(x = DIV_ARR_DELAY, color = as.factor(DIV_REACHED_DEST))) +
-  geom_density() +
-  scale_x_discrete(drop=FALSE)
-
-
-# ---- NEW Question -------------------
-#m1 <- cbind( table(df_top_10_airlines_with_zero$OP_UNIQUE_CARRIER),
-             #table(df_top_10_airlines$OP_UNIQUE_CARRIER), 
-             #c("American Airlines","Delta Air Lines", "ExpressJet Airlines","Frontier Airlines", "Envoy Air", 
-              # "Spirit Air Lines", "SkyWest Airlines","United Air Lines", "Southwest Airlines", "Mesa Airlines"))
-#colnames(m1) <- c("flight_count","delay_count", "airline_name")
-#m1 <- as.data.frame(m1)
-#m1$flight_count <- as.integer(m1$flight_count)
-#m1$delay_count <- as.integer(m1$delay_count)
-
-#ggplot(m1, aes(x =  flight_count, y = delay_count, color  = as.factor(airline_name))) +
-  #geom_point(aes(size = 5)) 
-
-top_cities <- names( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20))
-m2 <- cbind( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)[sort(names(head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)))],
-             table(no_zeros_delays[which(no_zeros_delays$DEST_CITY_NAME %in% top_cities), ]$DEST_CITY_NAME),
-             sort(names( head(sort(table(tx_flights$DEST_CITY_NAME), decreasing = TRUE), 20)), decreasing = FALSE))
-
-colnames(m2) <- c("flight_count","delay_count", "city_name")
-m2 <- as.data.frame(m2)
-m2$flight_count <- as.integer(m2$flight_count)
-m2$delay_count <- as.integer(m2$delay_count)
-
-ggplot(m2, aes(x =  flight_count, y = delay_count, color  = as.factor(city_name))) +
-  geom_point(aes(size = 5))+
-  labs( x = "Number of Flights", y = "Number of Delays", title = "Flight vs. Delay for Top 20 Cities")+
-  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))+
-  scale_colour_discrete(name = "City Names")
-
-
-
-top_10_cities <- names(sort(table(no_zeros_delays$DEST_CITY_NAME), decreasing = TRUE)[1:10])
-df_top_10_cities <- no_zeros_delays[which(no_zeros_delays$DEST_CITY_NAME %in% top_10_cities), ]
-
-ggplot(df_top_10_cities, aes(x = DEST_CITY_NAME , y = DEP_DELAY_NEW , fill = as.factor(DEST_CITY_NAME))) +
-  geom_boxplot()+
-  ylim(0, 100)
-
-#-------Question 4.5------------------------------------------------------------
+# sub-setting the tx_flights data frame 
+# to include only flights which were cancelled
 tx_flights_cancelled <- subset(tx_flights, CANCELLED == 1)
+
+# bar plots of day of the week versus number of cancellations
 ggplot(data = tx_flights_cancelled, aes(x = DAY_OF_WEEK)) + 
   geom_bar() +
   labs(x = "Day of the Week", y = "Number of Cancellations",
