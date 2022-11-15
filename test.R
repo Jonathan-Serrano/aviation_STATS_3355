@@ -266,7 +266,7 @@ print(mean_delay_times)
 
 # Quantile for each 10th of the distribution 
 quantile_10 <- c(1:10) / 10
-quantile_10 <- quantile(no_zeros_delays$DEP_DELAY_NEW, probs = o_O)
+quantile_10 <- quantile(no_zeros_delays$DEP_DELAY_NEW, probs = quantile_10)
 print(quantile_10) 
 #  10%  20%  30%  40%  50%  60%  70%  80%  90% 100% 
 #    2    5    8   13   18   27   39   60  102 3890 
@@ -291,7 +291,7 @@ top_cities <- names(head(sort(table(tx_flights$DEST_CITY_NAME),
 
 # making a matrix of flight count and delay count
 # for these 20 cities
-m2 <- cbind(head(sort(table(tx_flights$DEST_CITY_NAME), 
+city_delays <- cbind(head(sort(table(tx_flights$DEST_CITY_NAME), 
                       decreasing = TRUE), 20)
             [sort(names(head(sort(table(tx_flights$DEST_CITY_NAME), 
                                   decreasing = TRUE), 20)))],
@@ -300,23 +300,23 @@ m2 <- cbind(head(sort(table(tx_flights$DEST_CITY_NAME),
             sort(names( head(sort(table(tx_flights$DEST_CITY_NAME), 
                                   decreasing = TRUE), 20)), 
                  decreasing = FALSE))
-colnames(m2) <- c("flight_count","delay_count", "city_name")
+colnames(city_delays) <- c("flight_count", "delay_count", "city_name")
 
 # turning m2 into a data frame
-m2 <- as.data.frame(m2)
+city_delays <- as.data.frame(city_delays)
 
 # converting some of the variables in m2 into integer variables
-m2$flight_count <- as.integer(m2$flight_count)
-m2$delay_count <- as.integer(m2$delay_count)
+city_delays$flight_count <- as.integer(city_delays$flight_count)
+city_delays$delay_count <- as.integer(city_delays$delay_count)
 
 # Plotting number of flights versus number of delays for each of the 20 cities
-ggplot(m2, aes(x = flight_count, y = delay_count, 
+ggplot(city_delays, aes(x = flight_count, y = delay_count, 
                color = as.factor(city_name))) +
-  geom_point(aes(size = 5))+
+  geom_point(aes(size = 5)) +
   labs(x = "Number of Flights", y = "Number of Delays", 
        title = "Flight vs. Delay for Top 20 Cities") +
   theme(plot.title = element_text(hjust = 0.5), 
-        text = element_text(size = 20))+
+        text = element_text(size = 20)) +
   scale_colour_discrete(name = "City Names")
 
 #---Question 3.5---------------------------------------------------(DONE)-------
