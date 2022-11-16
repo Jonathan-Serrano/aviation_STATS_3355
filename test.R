@@ -130,7 +130,8 @@ ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"),
        y = "Delay Time in Minutes") +
   ylim(0, 175) +
   theme_economist() +
-  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20)) +
+  theme(plot.title = element_text(hjust = 0.5), 
+        text = element_text(size = 20)) +
   scale_x_discrete(labels = c("Monday", "Tuesday", "Wednesday", 
                               "Thursday", "Friday", "Saturday", "Sunday"))
 
