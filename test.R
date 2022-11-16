@@ -130,7 +130,7 @@ ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"),
        y = "Delay Time in Minutes") +
   ylim(0, 175) +
   theme_economist() +
-  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20)) +
   scale_x_discrete(labels = c("Monday", "Tuesday", "Wednesday", 
                               "Thursday", "Friday", "Saturday", "Sunday"))
 
@@ -224,7 +224,6 @@ ggplot(median_of_delay_times_cities_df,
   theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20), 
         axis.text.x = element_text(angle = 70, vjust = 1.05, hjust = 1))
   
-
 #----------Question 4.1--------------------------------------(DONE)-------------
 
 # 10 box plots of the distribution of delay times by month and year 
@@ -232,8 +231,12 @@ ggplot(data = subset(no_zeros_delays, DEST_STATE_NM == "Texas"),
        aes(x = as.factor(MONTH), y = DEP_DELAY_NEW)) +
   geom_boxplot() +
   ylim(0, 75) +
-  facet_wrap(~YEAR)
-
+  facet_wrap(~YEAR) +
+  labs(title = "Delay Time Distribution by Year and Month", x = "Months", 
+       y = "Delay Time in minutes") +
+  scale_x_discrete(labels = c("June", "July")) +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
+  
 #----------Question 3.1-------------------------------------(DONE)--------------
 
 # Histogram  Displaying Distribution of Delay times
@@ -279,7 +282,8 @@ ggplot(data = subset(no_zeros_delays,
   geom_point(mapping = aes(x = DISTANCE, y = DEP_DELAY_NEW)) +
   ylim(0,2000) +
   labs(title = "Delay Time by Distance", x = "Distance in miles", 
-       y = "Delay Time in minutes") 
+       y = "Delay Time in minutes") +
+  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
   
 
 #---Question 4.3------------------------------------------------(DONE)----------
@@ -302,7 +306,7 @@ city_delays <- cbind(head(sort(table(tx_flights$DEST_CITY_NAME),
                  decreasing = FALSE))
 colnames(city_delays) <- c("flight_count", "delay_count", "city_name")
 
-# turning m2 into a data frame
+# turning city_delays into a data frame
 city_delays <- as.data.frame(city_delays)
 
 # converting some of the variables in m2 into integer variables
@@ -389,13 +393,14 @@ ggplot(delay_causes,
 tx_flights_cancelled <- subset(tx_flights, CANCELLED == 1)
 
 # bar plots of day of the week versus number of cancellations
-ggplot(data = tx_flights_cancelled, aes(x = DAY_OF_WEEK)) + 
+ggplot(data = tx_flights_cancelled, aes(x = as.factor(DAY_OF_WEEK))) + 
   geom_bar() +
   labs(x = "Day of the Week", y = "Number of Cancellations",
        title = "Number of Cancellations per Day of the Week") +
+  theme(plot.title = element_text(hjust = 0.5), 
+        text = element_text(size = 20)) +
   scale_x_discrete(labels = c("Monday", "Tuesday", "Wednesday", 
-                              "Thursday", "Friday", "Saturday", "Sunday")) + 
-  theme(plot.title = element_text(hjust = 0.5), text = element_text(size = 20))
+                              "Thursday", "Friday", "Saturday", "Sunday")) 
 
 
 
