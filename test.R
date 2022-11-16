@@ -309,7 +309,7 @@ colnames(city_delays) <- c("flight_count", "delay_count", "city_name")
 # turning city_delays into a data frame
 city_delays <- as.data.frame(city_delays)
 
-# converting some of the variables in m2 into integer variables
+# converting some of the variables in city_delays into integer variables
 city_delays$flight_count <- as.integer(city_delays$flight_count)
 city_delays$delay_count <- as.integer(city_delays$delay_count)
 
